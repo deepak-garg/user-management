@@ -11,6 +11,6 @@ public class GlobalConstants {
     public static final String ACCESS_DENIED = "You don't have permission to access this page";
     public static final String OPTIONS_HTTP_METHOD = "OPTIONS";
     public static final String[] PUBLIC_URLS = {"/user/login", "/user/register","/user/resetpassword/**",
-                                                    "/user/image/**"};
+                                                    "/user/image/**", "/login"};
 
 }
