@@ -1,11 +1,15 @@
 server:
   port: 8081
-
+#  error:
+#    whitelabel:
+#        enabled: false
+  error:
+      path: /error
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/user-management
     driver-class-name: com.mysql.jdbc.Driver
-    password: password
+    password: root
     username: root
   jpa:
     show-sql: true
@@ -14,6 +18,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+#  mvc:
+#    throw-exception-if-no-handler-found: true
+#  resources:
+#    add-mappings: false
 
 jwt:
   secret: password

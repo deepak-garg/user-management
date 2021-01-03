@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.deepak.usermanagement.model.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,18 +14,21 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestControllerAdvice
-public class ExceptionHandling {
+public class ExceptionHandling implements ErrorController{
     private final Logger LOG = LoggerFactory.getLogger(getClass());
     public static final String ACCOUNT_LOCKED = "Your account has been locked. Please contact administration";
     public static final String METHOD_IS_NOT_ALLOWED = "This request method is not allowed on this endpoint. Please send '%s' request method";
@@ -33,6 +37,7 @@ public class ExceptionHandling {
     public static final String ACCOUNT_DISABLED = "Your account has been disabled";
     public static final String ERROR_PROCESSING_FILE = "Error occurred while processing file";
     public static final String NOT_ENOUGH_PERMISSION = "You do not have enough permission";
+    public static final String ERROR_PATH = "/error";
 
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<HttpResponse> accountDisabledException(DisabledException e) {
@@ -66,6 +71,11 @@ public class ExceptionHandling {
         return createHttpResponse(BAD_REQUEST, e.getMessage().toUpperCase());
     }
 
+    @ExceptionHandler(EmailExistException.class)
+    public ResponseEntity<HttpResponse> emailExistException(EmailExistException e) {
+        return createHttpResponse(BAD_REQUEST, e.getMessage().toUpperCase());
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<HttpResponse> methodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         HttpMethod supportMethod = Objects.requireNonNull(e.getSupportedHttpMethods()).iterator().next();
@@ -77,9 +87,27 @@ public class ExceptionHandling {
         return createHttpResponse(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_MSG);
     }
 
+    /*@ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<HttpResponse> noHandlerFoundException(NoHandlerFoundException e) {
+        return createHttpResponse(NOT_FOUND, "This page is not found");
+    }*/
+
+    @RequestMapping(ERROR_PATH)
+    public ResponseEntity<HttpResponse> mappingNotFound(HttpServletRequest request) {
+        return createHttpResponse(NOT_FOUND, "There is no mapping for this URL");
+    }
+
+    /**
+     * @deprecated
+     */
+    @Override
+    public String getErrorPath() {
+        return null;
+    }
+
     private ResponseEntity<HttpResponse> createHttpResponse(HttpStatus status, String message) {
         HttpResponse response = new HttpResponse(status.value(),
                                                 status, status.getReasonPhrase().toUpperCase(), message.toUpperCase());
         return  new ResponseEntity<>(response, status);
     }
- }
+}

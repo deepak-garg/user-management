@@ -6,7 +6,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+
 
 @Entity
 public class User implements Serializable {
@@ -21,16 +24,34 @@ public class User implements Serializable {
     private String password;
     private String email;
     private String profileImageUrl;
-    private LocalDateTime lastLoginDate;
-    private LocalDateTime lastLoginDateDisplay;
-    private LocalDateTime joinDate;
-    private String[] roles;
+    private Timestamp lastLoginDate;
+    private Timestamp lastLoginDateDisplay;
+    private Timestamp joinDate;
+    private String roles;
     private String[] authorities;
     private boolean isActive;
     private boolean isNotLocked;
 
     public User() {
 
+    }
+
+    public User(Long id, String userId, String firstName, String lastName, String userName, String password, String email, String profileImageUrl, Timestamp lastLoginDate, Timestamp lastLoginDateDisplay, Timestamp joinDate, String roles, String[] authorities, boolean isActive, boolean isNotLocked) {
+        this.id = id;
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userName = userName;
+        this.password = password;
+        this.email = email;
+        this.profileImageUrl = profileImageUrl;
+        this.lastLoginDate = lastLoginDate;
+        this.lastLoginDateDisplay = lastLoginDateDisplay;
+        this.joinDate = joinDate;
+        this.roles = roles;
+        this.authorities = authorities;
+        this.isActive = isActive;
+        this.isNotLocked = isNotLocked;
     }
 
     public Long getId() {
@@ -97,35 +118,35 @@ public class User implements Serializable {
         this.profileImageUrl = profileImageUrl;
     }
 
-    public LocalDateTime getLastLoginDate() {
+    public Timestamp getLastLoginDate() {
         return lastLoginDate;
     }
 
-    public void setLastLoginDate(LocalDateTime lastLoginDate) {
+    public void setLastLoginDate(Timestamp lastLoginDate) {
         this.lastLoginDate = lastLoginDate;
     }
 
-    public LocalDateTime getLastLoginDateDisplay() {
+    public Timestamp getLastLoginDateDisplay() {
         return lastLoginDateDisplay;
     }
 
-    public void setLastLoginDateDisplay(LocalDateTime lastLoginDateDisplay) {
+    public void setLastLoginDateDisplay(Timestamp lastLoginDateDisplay) {
         this.lastLoginDateDisplay = lastLoginDateDisplay;
     }
 
-    public LocalDateTime getJoinDate() {
+    public Timestamp getJoinDate() {
         return joinDate;
     }
 
-    public void setJoinDate(LocalDateTime joinDate) {
+    public void setJoinDate(Timestamp joinDate) {
         this.joinDate = joinDate;
     }
 
-    public String[] getRoles() {
+    public String getRoles() {
         return roles;
     }
 
-    public void setRoles(String[] roles) {
+    public void setRole(String roles) {
         this.roles = roles;
     }
 
