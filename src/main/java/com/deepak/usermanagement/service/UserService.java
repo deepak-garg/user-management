@@ -27,6 +27,9 @@ import static com.deepak.usermanagement.utils.DateTime.utcTime;
 @Transactional
 @Qualifier("userDetailsService")
 public class UserService implements UserDetailsService {
+    public static final String USERNAME_ALREADY_EXIST = "Username already exist";
+    public static final String EMAIL_ALREADY_EXISTS = "Email already exists";
+    public static final String DEFAULT_PROFILE_IMAGE_PATH = "/user/image/profile/temp";
     private Logger LOG = LoggerFactory.getLogger(UserService.class);
     private UserRepository userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -61,11 +64,11 @@ public class UserService implements UserDetailsService {
         user.setAuthorities(ROLE_USER.getAuthorities());
         user.setProfileImageUrl(getTemporaryProfileImage());
         userRepository.save(user);
-        return null;
+        return user;
     }
 
     public List<User> getUsers() {
-        return null;
+        return userRepository.findAll();
     }
 
     public User findUserByUsername(String username) {
@@ -79,11 +82,11 @@ public class UserService implements UserDetailsService {
     private void validateNewUsernameAndEmail(String newUsername, String email) throws UsernameExistException, EmailExistException {
         User userByUsername = findUserByUsername(newUsername);
         if(userByUsername!=null) {
-            throw new UsernameExistException("Username already exist");
+            throw new UsernameExistException(USERNAME_ALREADY_EXIST);
         }
         User userByEmail = findUserByEmail(email);
         if(userByEmail!=null) {
-            throw new EmailExistException("Email already exists");
+            throw new EmailExistException(EMAIL_ALREADY_EXISTS);
         }
     }
 
@@ -100,6 +103,6 @@ public class UserService implements UserDetailsService {
     }
 
     private String getTemporaryProfileImage() {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/image/profile/temp").toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_PROFILE_IMAGE_PATH).toUriString();
     }
 }
