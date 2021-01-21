@@ -27,16 +27,22 @@ import static com.deepak.usermanagement.utils.DateTime.utcTime;
 @Transactional
 @Qualifier("userDetailsService")
 public class UserService implements UserDetailsService {
-    public static final String USERNAME_ALREADY_EXIST = "Username already exist";
-    public static final String EMAIL_ALREADY_EXISTS = "Email already exists";
-    public static final String DEFAULT_PROFILE_IMAGE_PATH = "/user/image/profile/temp";
-    private Logger LOG = LoggerFactory.getLogger(UserService.class);
-    private UserRepository userRepository;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
+    private static final String USERNAME_ALREADY_EXIST = "Username already exist";
+    private static final String EMAIL_ALREADY_EXISTS = "Email already exists";
+    private static final String DEFAULT_PROFILE_IMAGE_PATH = "/user/image/profile/temp";
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final LoginAttemptService loginAttemptService;
+
+    public UserService(UserRepository userRepository,
+                       BCryptPasswordEncoder bCryptPasswordEncoder,
+                       LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.loginAttemptService = loginAttemptService;
     }
+    //call at the time of login by spring security
     @Override
     public UserDetails loadUserByUsername(final String userName) throws UsernameNotFoundException {
         User user = userRepository.findUserByUserName(userName);
@@ -56,7 +62,7 @@ public class UserService implements UserDetailsService {
     public User register(final User user) throws UsernameExistException, EmailExistException {
         validateNewUsernameAndEmail(user.getUserName(), user.getEmail());
         user.setUserId(generateUserId());
-        user.setPassword(encodePassword(generatePassword()));
+        user.setPassword(encodePassword(user.getPassword()));
         user.setJoinDate(utcTime());
         user.setActive(true);
         user.setNotLocked(true);
@@ -92,10 +98,6 @@ public class UserService implements UserDetailsService {
 
     private String generateUserId() {
         return RandomStringUtils.randomNumeric(10);
-    }
-
-    private String generatePassword() {
-        return RandomStringUtils.randomAlphanumeric(10);
     }
 
     private String encodePassword(String password) {
