@@ -84,6 +84,7 @@ public class ExceptionHandling implements ErrorController{
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<HttpResponse> internalServerException(Exception e) {
+        LOG.error("Exception occurred",e);
         return createHttpResponse(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_MSG);
     }
 
